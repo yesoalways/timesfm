@@ -27,10 +27,17 @@ Any agent that supports the open [Agent Skills standard](https://agentskills.io)
 If you are developing TimesFM itself (not using it), the source lives in `src/timesfm/`.
 Archived v1/v2 code and notebooks are in `v1/`.
 
-Run tests:
+Current tests and the CI package build:
 
 ```bash
-pytest v1/tests/
+.venv/bin/python -m pytest tests/
+.venv/bin/python -m build
 ```
 
 See `README.md` for full developer setup.
+
+## Cloud Agent
+
+This image has no GPU. The environment install creates `.venv` here with CPU PyTorch (`torch` from the CPU wheel index) and CPU JAX. The `flax` extra in `pyproject.toml` depends on `jax[cuda]`, which does not run on this image; CPU JAX is installed instead so `tests/test_model_loading.py` can import the Flax wrapper.
+
+Load the pretrained checkpoint with `torch_compile=False`. The default `torch_compile=True` calls `torch.compile`, which is the wrong path on CPU. The sibling checkouts `Claude-Code-Game-Studios` and `desktop-tutorial` have no install or runtime.
